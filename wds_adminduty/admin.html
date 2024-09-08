@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Duty Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Alapértelmezett rejtett állapot */
+        }
+        #container {
+            width: 300px;
+            padding: 20px;
+            background-color: #131313;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        #container h2 {
+            margin: 0 0 20px 0;
+            font-size: 18px;
+        }
+        #toggleSwitch {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #toggleSwitch label {
+            margin-left: 10px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 50px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+        #closeButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #f44336;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 18px;
+        }
+        .h2 {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2 style="color: white">Admin Duty Panel</h2>
+        <div id="toggleSwitch">
+            <label class="switch">
+                <input type="checkbox" id="adminDutySwitch">
+                <span class="slider"></span>
+            </label>
+            <label for="adminDutySwitch" style="color: white">Admin Duty</label>
+        </div>
+        <div id="closeButton">x</div>
+    </div>
+    <script>
+        document.getElementById('adminDutySwitch').addEventListener('change', function() {
+            let isOnAdminDuty = this.checked;
+            fetch(`https://${GetParentResourceName()}/toggleAdminDuty`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ isOnAdminDuty })
+            }).then(res => res.json()).then(data => console.log(data));
+        });
+
+        document.getElementById('closeButton').addEventListener('click', function() {
+            fetch(`https://${GetParentResourceName()}/closeUI`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(data => console.log(data));
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'openAdminPanel') {
+                document.getElementById('adminDutySwitch').checked = event.data.isOnAdminDuty;
+                document.body.style.display = 'flex';  // Panel megjelenítése
+            } else if (event.data.action === 'close') {
+                document.body.style.display = 'none'; // Panel elrejtése
+            }
+        });
+    </script>
+</body>
+</html>
